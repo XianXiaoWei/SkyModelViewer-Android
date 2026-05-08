@@ -2,6 +2,8 @@
 
 Sky Model Viewer is a small Windows desktop tool for inspecting local mesh files from a legally installed copy of *Sky: Children of the Light*. It indexes a local install, lets you browse discovered meshes, and renders supported meshes with basic material and texture lookup.
 
+![Sky Model Viewer screenshot](screenshot.jpg)
+
 ## Uses
 
 - Browse mesh files from a local Sky install or extracted local asset tree.
