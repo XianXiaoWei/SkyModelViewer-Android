@@ -1,4 +1,5 @@
-using System.Diagnostics;
+using BCnEncoder.Decoder;
+using BCnEncoder.Shared;
 using System.IO;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -21,10 +22,6 @@ internal static class TextureLoader
     ];
 
     private static readonly Dictionary<string, ImageSource?> Cache = new(StringComparer.OrdinalIgnoreCase);
-    private static readonly object DecoderPythonLock = new();
-    private static string? DecoderPython;
-    private static bool DecoderPythonResolved;
-    private static bool MissingDecoderLogged;
 
     public static ImageSource? Load(string texturePath)
     {
@@ -77,8 +74,8 @@ internal static class TextureLoader
         byte[]? bgra = image.InternalFormat switch
         {
             GlRgba8 when image.GlType == GlUnsignedByte && image.GlFormat == GlRgba => SwizzleRgbaToBgra(image.Data),
-            GlCompressedRgbaBptcUnorm or GlCompressedSrgbAlphaBptcUnorm => DecodeCompressedKtxWithPython(texturePath),
-            GlCompressedRedRgtc1 => DecodeCompressedKtxWithPython(texturePath),
+            GlCompressedRgbaBptcUnorm or GlCompressedSrgbAlphaBptcUnorm => DecodeCompressedKtx(image),
+            GlCompressedRedRgtc1 => DecodeCompressedKtx(image),
             _ => null,
         };
 
@@ -161,270 +158,51 @@ internal static class TextureLoader
         return bgra;
     }
 
-    private static byte[]? DecodeCompressedKtxWithPython(string texturePath)
+    private static byte[]? DecodeCompressedKtx(KtxImage image)
     {
-        var python = FindDecoderPython();
-        if (python is null)
+        var format = image.InternalFormat switch
         {
-            LogMissingDecoder();
-            return null;
-        }
-
-        // texture2ddecoder returns BGRA, which matches WPF PixelFormats.Bgra32.
-        const string script =
-            "import struct, sys\n"
-            + "import texture2ddecoder\n"
-            + "p = sys.argv[1]\n"
-            + "b = open(p, 'rb').read()\n"
-            + "fmt = struct.unpack_from('<I', b, 28)[0]\n"
-            + "w, h = struct.unpack_from('<II', b, 36)\n"
-            + "kv = struct.unpack_from('<I', b, 60)[0]\n"
-            + "off = 64 + kv\n"
-            + "size = struct.unpack_from('<I', b, off)[0]\n"
-            + "payload = b[off + 4:off + 4 + size]\n"
-            + "if fmt in (0x8E8C, 0x8E8D):\n"
-            + "    bgra = texture2ddecoder.decode_bc7(payload, w, h)\n"
-            + "elif fmt == 0x8DBB:\n"
-            + "    bgra = texture2ddecoder.decode_bc4(payload, w, h)\n"
-            + "else:\n"
-            + "    raise SystemExit(3)\n"
-            + "sys.stdout.buffer.write(struct.pack('<II', w, h))\n"
-            + "sys.stdout.buffer.write(bgra)\n";
-
-        using var process = new Process();
-        process.StartInfo = new ProcessStartInfo
-        {
-            FileName = python,
-            UseShellExecute = false,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            CreateNoWindow = true,
-            WindowStyle = ProcessWindowStyle.Hidden,
+            GlCompressedRgbaBptcUnorm or GlCompressedSrgbAlphaBptcUnorm => CompressionFormat.Bc7,
+            GlCompressedRedRgtc1 => CompressionFormat.Bc4,
+            _ => CompressionFormat.Unknown,
         };
-        process.StartInfo.ArgumentList.Add("-c");
-        process.StartInfo.ArgumentList.Add(script);
-        process.StartInfo.ArgumentList.Add(texturePath);
 
-        using var output = new MemoryStream();
-        process.Start();
-        var copyOutput = process.StandardOutput.BaseStream.CopyToAsync(output);
-        var readError = process.StandardError.ReadToEndAsync();
-
-        if (!process.WaitForExit(30_000))
+        if (format == CompressionFormat.Unknown)
         {
-            try
+            return null;
+        }
+
+        try
+        {
+            var pixels = new BcDecoder().DecodeRaw(image.Data, image.Width, image.Height, format);
+            if (pixels.Length != image.Width * image.Height)
             {
-                process.Kill(entireProcessTree: true);
-            }
-            catch
-            {
-                // Best-effort cleanup; texture load will fall back to solid color.
+                return null;
             }
 
-            return null;
+            return RgbaToBgra(pixels);
         }
-
-        copyOutput.GetAwaiter().GetResult();
-        var error = readError.GetAwaiter().GetResult();
-
-        if (process.ExitCode != 0 || output.Length < 8)
+        catch (Exception ex)
         {
-            Program.LogMessage($"Texture decoder failed for {texturePath}: exit={process.ExitCode} error={error.Trim()}");
+            Program.LogMessage($"Texture decoder failed: format=0x{image.InternalFormat:X} size={image.Width}x{image.Height} error={ex.Message}");
             return null;
         }
+    }
 
-        var decoded = output.ToArray();
-        var width = checked((int)ReadUInt32(decoded, 0));
-        var height = checked((int)ReadUInt32(decoded, 4));
-        var pixelBytes = width * height * 4;
-        if (decoded.Length != 8 + pixelBytes)
+    private static byte[] RgbaToBgra(ColorRgba32[] pixels)
+    {
+        var bgra = new byte[pixels.Length * 4];
+        for (var i = 0; i < pixels.Length; i++)
         {
-            return null;
+            var pixel = pixels[i];
+            var offset = i * 4;
+            bgra[offset] = pixel.b;
+            bgra[offset + 1] = pixel.g;
+            bgra[offset + 2] = pixel.r;
+            bgra[offset + 3] = pixel.a;
         }
 
-        var bgra = new byte[pixelBytes];
-        Buffer.BlockCopy(decoded, 8, bgra, 0, pixelBytes);
         return bgra;
-    }
-
-    private static string? FindDecoderPython()
-    {
-        lock (DecoderPythonLock)
-        {
-            if (DecoderPythonResolved)
-            {
-                return DecoderPython;
-            }
-
-            foreach (var candidate in EnumerateDecoderPythonCandidates())
-            {
-                if (CanImportTextureDecoder(candidate))
-                {
-                    DecoderPython = candidate;
-                    DecoderPythonResolved = true;
-                    Program.LogMessage($"Using texture decoder Python: {candidate}");
-                    return candidate;
-                }
-            }
-
-            DecoderPythonResolved = true;
-            return null;
-        }
-    }
-
-    private static IEnumerable<string> EnumerateDecoderPythonCandidates()
-    {
-        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-        foreach (var envName in new[] { "SKYMODELVIEWER_TEXTURE_PYTHON", "SKYMODELVIEWER_PYTHON" })
-        {
-            foreach (var candidate in ExpandPythonPath(Environment.GetEnvironmentVariable(envName)))
-            {
-                if (seen.Add(candidate))
-                {
-                    yield return candidate;
-                }
-            }
-        }
-
-        foreach (var start in new[] { AppContext.BaseDirectory, Environment.CurrentDirectory })
-        {
-            foreach (var root in EnumerateAncestorDirectories(start))
-            {
-                foreach (var candidate in ExpandPythonPath(Path.Combine(root, ".venv")))
-                {
-                    if (seen.Add(candidate))
-                    {
-                        yield return candidate;
-                    }
-                }
-
-                foreach (var child in EnumerateDirectoriesSafe(root))
-                {
-                    foreach (var candidate in ExpandPythonPath(Path.Combine(child, ".venv")))
-                    {
-                        if (seen.Add(candidate))
-                        {
-                            yield return candidate;
-                        }
-                    }
-                }
-            }
-        }
-
-        foreach (var command in new[] { "python.exe", "python", "py.exe", "py" })
-        {
-            if (seen.Add(command))
-            {
-                yield return command;
-            }
-        }
-    }
-
-    private static IEnumerable<string> ExpandPythonPath(string? value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            yield break;
-        }
-
-        var path = value.Trim().Trim('"');
-        if (File.Exists(path))
-        {
-            yield return path;
-            yield break;
-        }
-
-        if (!Directory.Exists(path))
-        {
-            yield break;
-        }
-
-        foreach (var candidate in new[]
-        {
-            Path.Combine(path, "Scripts", "python.exe"),
-            Path.Combine(path, ".venv", "Scripts", "python.exe"),
-            Path.Combine(path, "python.exe"),
-        })
-        {
-            if (File.Exists(candidate))
-            {
-                yield return candidate;
-            }
-        }
-    }
-
-    private static IEnumerable<string> EnumerateAncestorDirectories(string start)
-    {
-        var cur = Directory.Exists(start) ? Path.GetFullPath(start) : Path.GetDirectoryName(start);
-        while (!string.IsNullOrWhiteSpace(cur))
-        {
-            yield return cur;
-            cur = Directory.GetParent(cur)?.FullName;
-        }
-    }
-
-    private static IEnumerable<string> EnumerateDirectoriesSafe(string path)
-    {
-        try
-        {
-            return Directory.EnumerateDirectories(path).ToList();
-        }
-        catch
-        {
-            return [];
-        }
-    }
-
-    private static bool CanImportTextureDecoder(string python)
-    {
-        try
-        {
-            using var process = new Process();
-            process.StartInfo = new ProcessStartInfo
-            {
-                FileName = python,
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                CreateNoWindow = true,
-                WindowStyle = ProcessWindowStyle.Hidden,
-            };
-            process.StartInfo.ArgumentList.Add("-c");
-            process.StartInfo.ArgumentList.Add("import texture2ddecoder");
-
-            process.Start();
-            if (!process.WaitForExit(5_000))
-            {
-                try
-                {
-                    process.Kill(entireProcessTree: true);
-                }
-                catch
-                {
-                    // Best-effort cleanup; another candidate may still work.
-                }
-
-                return false;
-            }
-
-            return process.ExitCode == 0;
-        }
-        catch
-        {
-            return false;
-        }
-    }
-
-    private static void LogMissingDecoder()
-    {
-        if (MissingDecoderLogged)
-        {
-            return;
-        }
-
-        MissingDecoderLogged = true;
-        Program.LogMessage("No Python with texture2ddecoder was found; compressed KTX textures cannot be decoded.");
     }
 
     private static uint ReadUInt32(byte[] data, int offset)

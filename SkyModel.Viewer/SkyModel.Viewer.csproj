@@ -4,6 +4,10 @@
     <ProjectReference Include="..\SkyModel.Core\SkyModel.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="BCnEncoder.Net" Version="2.3.0" />
+  </ItemGroup>
+
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net9.0-windows</TargetFramework>

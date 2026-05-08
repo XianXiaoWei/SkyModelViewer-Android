@@ -7,14 +7,13 @@ Sky Model Viewer is a small Windows desktop tool for inspecting local mesh files
 - Browse mesh files from a local Sky install or extracted local asset tree.
 - Preview supported static meshes in a simple 3D viewport.
 - Inspect mesh metadata such as vertex counts, face counts, UV data, skeleton counts, material names, and inferred scale.
-- Resolve common material definitions and display supported texture formats when the required local decoder support is available.
+- Resolve common material definitions and display supported texture formats with built-in BC4/BC7 KTX decoding.
 
 ## Limitations
 
 - This is a viewer, not an editor or asset extraction tool.
 - The project does not export models, textures, animations, levels, or other game assets.
 - Mesh, material, shader, and texture support is incomplete and based on reverse-engineered local file formats.
-- Some compressed KTX textures require a local Python environment with `texture2ddecoder`; set `SKYMODELVIEWER_TEXTURE_PYTHON` if the viewer cannot find it automatically.
 - The app targets Windows/WPF and requires the .NET 9 SDK to build from source.
 - No game files are included. You must provide your own local install path.
 
