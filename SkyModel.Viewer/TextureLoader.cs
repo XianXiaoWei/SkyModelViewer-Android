@@ -170,6 +170,7 @@ internal static class TextureLoader
             return null;
         }
 
+        // texture2ddecoder returns BGRA, which matches WPF PixelFormats.Bgra32.
         const string script =
             "import struct, sys\n"
             + "import texture2ddecoder\n"
@@ -182,16 +183,13 @@ internal static class TextureLoader
             + "size = struct.unpack_from('<I', b, off)[0]\n"
             + "payload = b[off + 4:off + 4 + size]\n"
             + "if fmt in (0x8E8C, 0x8E8D):\n"
-            + "    rgba = texture2ddecoder.decode_bc7(payload, w, h)\n"
+            + "    bgra = texture2ddecoder.decode_bc7(payload, w, h)\n"
             + "elif fmt == 0x8DBB:\n"
-            + "    rgba = texture2ddecoder.decode_bc4(payload, w, h)\n"
+            + "    bgra = texture2ddecoder.decode_bc4(payload, w, h)\n"
             + "else:\n"
             + "    raise SystemExit(3)\n"
-            + "pixels = bytearray(rgba)\n"
-            + "for i in range(0, len(pixels), 4):\n"
-            + "    pixels[i], pixels[i + 2] = pixels[i + 2], pixels[i]\n"
             + "sys.stdout.buffer.write(struct.pack('<II', w, h))\n"
-            + "sys.stdout.buffer.write(pixels)\n";
+            + "sys.stdout.buffer.write(bgra)\n";
 
         using var process = new Process();
         process.StartInfo = new ProcessStartInfo
