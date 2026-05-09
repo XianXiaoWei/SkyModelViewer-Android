@@ -1,0 +1,103 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build and publish release
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Validate SemVer tag
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          if (-not $tag.StartsWith("v")) {
+            throw "Release tags must start with 'v'. Example: v0.1.0"
+          }
+
+          $version = $tag.Substring(1)
+          $semverPattern = '^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[A-Za-z-][0-9A-Za-z-]*)(?:\.(?:0|[1-9]\d*|\d*[A-Za-z-][0-9A-Za-z-]*))*))?(?:\+([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?$'
+          if ($version -notmatch $semverPattern) {
+            throw "Tag '$tag' is not valid SemVer. Use vMAJOR.MINOR.PATCH, for example v0.1.0 or v0.2.0-beta.1"
+          }
+
+          $versionCore = ($version -split '[-+]')[0]
+          $isPrerelease = $version.Contains("-")
+          $shortSha = "${{ github.sha }}".Substring(0, 12)
+          $informationalVersion = if ($version.Contains("+")) { "$version.sha.$shortSha" } else { "$version+sha.$shortSha" }
+
+          "RELEASE_TAG=$tag" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "VERSION_CORE=$versionCore" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "INFORMATIONAL_VERSION=$informationalVersion" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "IS_PRERELEASE=$isPrerelease" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+      - name: Restore
+        run: dotnet restore SkyModelViewer.sln
+
+      - name: Build
+        run: >
+          dotnet build SkyModelViewer.sln
+          -c Release
+          --no-restore
+          -p:Version=${{ env.VERSION }}
+          -p:AssemblyVersion=${{ env.VERSION_CORE }}.0
+          -p:FileVersion=${{ env.VERSION_CORE }}.0
+          -p:InformationalVersion=${{ env.INFORMATIONAL_VERSION }}
+
+      - name: Publish Windows build
+        run: >
+          dotnet publish SkyModel.Viewer/SkyModel.Viewer.csproj
+          -c Release
+          -r win-x64
+          --self-contained true
+          -o artifacts/SkyModelViewer-${{ env.VERSION }}-win-x64
+          -p:Version=${{ env.VERSION }}
+          -p:AssemblyVersion=${{ env.VERSION_CORE }}.0
+          -p:FileVersion=${{ env.VERSION_CORE }}.0
+          -p:InformationalVersion=${{ env.INFORMATIONAL_VERSION }}
+          -p:PublishSingleFile=true
+          -p:IncludeNativeLibrariesForSelfExtract=true
+
+      - name: Package
+        shell: pwsh
+        run: |
+          $assetName = "SkyModelViewer-$env:VERSION-win-x64.zip"
+          Compress-Archive -Path "artifacts/SkyModelViewer-$env:VERSION-win-x64/*" -DestinationPath $assetName -Force
+          $hash = Get-FileHash -Algorithm SHA256 $assetName
+          "$($hash.Hash)  $assetName" | Out-File -FilePath "$assetName.sha256" -Encoding ascii
+          "ASSET_NAME=$assetName" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+      - name: Create GitHub release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $args = @(
+            "release", "create", $env:RELEASE_TAG,
+            $env:ASSET_NAME,
+            "$env:ASSET_NAME.sha256",
+            "--title", "Sky Model Viewer $env:VERSION",
+            "--generate-notes"
+          )
+
+          if ($env:IS_PRERELEASE -eq "True") {
+            $args += "--prerelease"
+          }
+
+          gh @args
