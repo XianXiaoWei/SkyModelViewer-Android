@@ -41,3 +41,5 @@ converted_textures/
 *.ktx
 *.level.bin
 *.tgc
+!SkyModel.Viewer/Assets/
+!SkyModel.Viewer/Assets/UIEye.ico

@@ -8,6 +8,11 @@
     <PackageReference Include="BCnEncoder.Net" Version="2.3.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="Assets\UIEye.ico" />
+    <Resource Include="Assets\UIEye.ico" />
+  </ItemGroup>
+
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net9.0-windows</TargetFramework>
@@ -15,6 +20,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <StartupObject>SkyModel.Viewer.Program</StartupObject>
+    <ApplicationIcon>Assets\UIEye.ico</ApplicationIcon>
   </PropertyGroup>
 
 </Project>

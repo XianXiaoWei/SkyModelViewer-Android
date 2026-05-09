@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="Sky Model Viewer"
+        Icon="Assets/UIEye.ico"
         Height="760"
         Width="1280"
         MinHeight="620"
