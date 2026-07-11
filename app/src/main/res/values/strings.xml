@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Sky Model Viewer</string>
+    <string name="select_source">Select Source</string>
+    <string name="choose_apk">Choose APK File</string>
+    <string name="choose_installed">Choose Installed App</string>
+    <string name="asset_browser">Asset Browser</string>
+    <string name="no_index_loaded">No index loaded</string>
+    <string name="filter_meshes">Filter meshes...</string>
+    <string name="no_mesh_selected">No mesh selected</string>
+    <string name="selection_details">Selection Details</string>
+    <string name="export_glb">Export GLB</string>
+    <string name="batch_export">Batch Export</string>
+    <string name="view_texture">Texture</string>
+    <string name="view_solid">Solid</string>
+    <string name="view_wire">Wire</string>
+    <string name="status_ready">Ready</string>
+    <string name="status_select_source">Select APK or installed app</string>
+    <string name="status_indexing">Indexing assets...</string>
+    <string name="status_indexed">Indexed %1$d meshes</string>
+    <string name="status_loading">Loading %1$s</string>
+    <string name="status_loaded">Loaded %1$s</string>
+    <string name="status_exporting">Exporting GLB...</string>
+    <string name="status_exported">Exported to %1$s</string>
+    <string name="status_export_failed">Export failed</string>
+    <string name="status_batch_complete">Batch complete: %1$d exported, %2$d skipped, %3$d failed</string>
+</resources>
