@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg_dark">#11151C</color>
+    <color name="bg_panel">#FFFFFF</color>
+    <color name="bg_panel_border">#D9DEE6</color>
+    <color name="bg_app">#F3F5F7</color>
+    <color name="text_primary">#111827</color>
+    <color name="text_muted">#667085</color>
+    <color name="primary">#2864D8</color>
+    <color name="primary_dark">#1F55BC</color>
+    <color name="status_bg">#E8EEF8</color>
+    <color name="status_border">#D1DBEE</color>
+    <color name="divider">#E2E8F0</color>
+</resources>
