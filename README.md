@@ -189,6 +189,7 @@ app/src/main/java/com/sky/modelviewer/
 - [that-sky-level](https://github.com/that-sky-project/that-sky-level) — .meshes 格式参考
 - [that-sky-level-meshes](https://github.com/that-sky-project/that-sky-level-meshes) — meshopt 解码参考
 - [Sky-mesh-examine](https://github.com/fishl520/Sky-mesh-examine) — 全版本 .mesh 解析参考
+- [that-sky-unktx](https://github.com/that-sky-project/that-sky-unktx) — .ktx 导出参考
 
 ## 📋 更新历史
 
