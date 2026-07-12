@@ -4,7 +4,7 @@
 
 **Sky Model Viewer** 是一款运行在 **Android 平台** 上的 3D 模型查看工具。它是原 Windows 桌面版（基于 WPF/.NET 9）的社区移植版本，专为移动设备优化。
 
-本应用旨在为《光·遇》的爱好者与内容创作者提供一个便捷的移动端解决方案，用于**安全、只读地**浏览本地游戏网格文件。
+本应用旨在为《光·遇》的爱好者与内容创作者提供一个便捷的移动端解决方案，用于**安全、只读地**浏览本地游戏网格文件，并支持多格式导出。
 
 **⚠️ 重要提示**：本项目是一个**查看器（Viewer）**，**不是**提取器（Extractor）或编辑器（Editor）。它不包含任何游戏代码、资源文件，也无法导出或修改游戏资产。
 
@@ -20,7 +20,10 @@
 - **材质与纹理解析**：解析常见的材质定义，并支持显示特定格式（如 BC4/BC7 KTX）的纹理。
 - **移动端适配**：针对 Android 触摸操作进行了界面与交互优化。
 - **全版本解析**：支持所有版本的 `.mesh`（模型）和 `.meshes`（地形）文件解析。
-- **GLB 导出**：支持将模型导出为 GLB 格式。
+- **多格式导出**：
+  - 模型：OBJ / GLB / FBX
+  - 贴图：PNG / JPEG
+  - 地图：完整关卡导出（地形 + mesh 实例，含位置变换）→ OBJ / GLB / FBX
 
 ## 📦 支持的文件格式与版本
 
@@ -63,11 +66,58 @@
 | 28 | 4 | gi_light | 4×u8 |
 | 32 | 4 | meta_id | u32 |
 
-### 技术实现
+## 📤 导出功能
 
-- **meshopt 顶点解码**：纯 Java 实现，支持 version 0（u8 zigzag delta）和 version 1（u8/u16/u32 delta）
-- **LZ4 块解压**：纯 Java 实现（.meshes）+ lz4-java 库（.mesh）
-- **材质颜色**：80+ 种游戏材质映射到 RGB 颜色，顶点颜色通过 4 个材质 ID 和权重的加权混合计算
+### 模型导出
+
+| 格式 | 内容 | 说明 |
+|------|------|------|
+| OBJ | v / vn / vt / f | 含顶点、法线、UV、面，1-based 索引 |
+| GLB | glTF 2.0 二进制 | 含位置、法线、UV、索引，Y轴翻转 |
+| FBX | ASCII FBX 7.4 | 兼容 Blender/Maya/3ds Max |
+
+### 贴图导出
+
+| 格式 | 说明 |
+|------|------|
+| PNG | 无损压缩，保留 Alpha 通道 |
+| JPEG | 有损压缩（质量 95），Alpha 通道自动合成黑色背景 |
+
+### 地图导出（完整关卡）
+
+导出内容包含**两部分**合并为一个文件：
+
+1. **地形数据** — 所有 .meshes terrain blob 的顶点和索引
+2. **mesh 实例** — 关卡中放置的所有模型，每个实例的顶点位置应用 4x4 变换矩阵到世界空间坐标
+
+| 格式 | 说明 |
+|------|------|
+| OBJ (完整) | 按 `g terrain_0`、`g mesh_0_Name` 分组，含变换后的顶点/法线/UV |
+| GLB (完整) | 地形 + mesh 合并为一个 glTF mesh |
+| FBX (完整) | 地形 + mesh 合并为一个 FBX geometry |
+
+**变换处理**：
+- 顶点位置：完整 4x4 变换（旋转 + 平移）→ 世界空间
+- 法线：仅旋转部分，变换后重新归一化
+- UV：直接保留
+
+## 🛠️ 技术实现
+
+### meshopt 顶点解码
+
+纯 Java 移植自 [meshoptimizer](https://github.com/zeux/meshoptimizer)，支持：
+- **Version 0**：无控制字节，所有通道为 u8 zigzag delta，bit-packed 编码
+- **Version 1**：有控制字节和通道配置，支持 u8/u16/u32 delta 编码
+
+### LZ4 块解压
+
+两套实现：
+- `.meshes` 文件：纯 Java LZ4 块解码器
+- `.mesh` 文件：使用 lz4-java 库
+
+### 材质颜色
+
+80+ 种游戏材质映射到 RGB 颜色，顶点颜色通过 4 个材质 ID 和权重的加权混合计算。
 
 ## 🚧 项目状态与局限性
 
@@ -106,6 +156,46 @@ git clone https://github.com/XianXiaoWei/SkyModelViewer-Android.git
 - Java 7 兼容
 - 依赖：lz4-java-1.8.0
 
+## 📁 项目结构
+
+```
+app/src/main/java/com/sky/modelviewer/
+├── MainActivity.java          # 主界面，APK 浏览和模型加载
+├── parsing/
+│   ├── TgcMeshReader.java     # .mesh 模型解析（0x17-0x20）
+│   ├── LevelMeshesReader.java # .meshes 地形解析（0x34-0x3D）
+│   ├── MeshoptDecoder.java    # meshopt 顶点解码器
+│   ├── LZ4BlockDecoder.java   # 纯 Java LZ4 块解压
+│   └── LevelFileParser.java   # Objects.level.bin 解析
+├── render/
+│   ├── MeshRenderer.java      # OpenGL ES 渲染
+│   └── KtxTextureLoader.java  # KTX 纹理加载
+├── scanner/
+│   └── SkyAssetScanner.java   # APK 资源扫描
+├── export/
+│   ├── ObjExporter.java       # OBJ 格式导出（模型/地形/完整关卡）
+│   ├── GlbExporter.java       # GLB 格式导出（模型/地形/完整关卡）
+│   ├── FbxExporter.java       # FBX 格式导出（模型/地形/完整关卡）
+│   └── TextureExporter.java   # 贴图导出（PNG/JPEG）
+└── model/
+    ├── MeshData.java          # 模型数据结构
+    ├── BoneWeight.java        # 骨骼权重
+    └── SkeletonBone.java      # 骨骼
+```
+
+## 🙏 参考项目
+
+- [SkyModelViewer](https://github.com/kfhammond/SkyModelViewer) — 原 Windows 桌面版
+- [that-sky-level](https://github.com/that-sky-project/that-sky-level) — .meshes 格式参考
+- [that-sky-level-meshes](https://github.com/that-sky-project/that-sky-level-meshes) — meshopt 解码参考
+- [Sky-mesh-examine](https://github.com/fishl520/Sky-mesh-examine) — 全版本 .mesh 解析参考
+
+## 📋 更新历史
+
+- **v1.2.0** — 多格式导出（OBJ/GLB/FBX/PNG/JPEG）+ 完整关卡导出
+- **v1.1.0** — 全版本 .mesh/.meshes 解析支持（0x17-0x20, 0x34-0x3D）
+- **v1.0.0** — 初始版本，基础 APK 浏览与 3D 模型预览
+
 ## 🤝 贡献与反馈
 
 由于是个人维护的移植项目，目前可能有很多不完善的地方。欢迎通过 [**Issues**](https://github.com/XianXiaoWei/SkyModelViewer-Android/issues) 页面提出建议或报告问题。
@@ -118,17 +208,5 @@ git clone https://github.com/XianXiaoWei/SkyModelViewer-Android.git
 ## 📜 许可证
 
 本项目为个人学习与研究目的开源，具体许可协议请参见项目根目录的 `LICENSE` 文件（若有）。若无明确声明，默认保留所有权利。
-
-## 🙏 参考项目
-
-- [SkyModelViewer](https://github.com/kfhammond/SkyModelViewer) — 原 Windows 桌面版
-- [that-sky-level](https://github.com/that-sky-project/that-sky-level) — .meshes 格式参考
-- [that-sky-level-meshes](https://github.com/that-sky-project/that-sky-level-meshes) — meshopt 解码参考
-- [Sky-mesh-examine](https://github.com/fishl520/Sky-mesh-examine) — 全版本 .mesh 解析参考
-
-## 📋 更新历史
-
-- **v1.1.0** — 全版本 .mesh/.meshes 解析支持（0x17-0x20, 0x34-0x3D）
-- **v1.0.0** — 初始版本，基础 APK 浏览与 3D 模型预览
 
 **最后更新**：2026年7月12日
