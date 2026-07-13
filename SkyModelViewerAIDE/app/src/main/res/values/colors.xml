@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App backgrounds -->
+    <color name="bg_dark">#0F1117</color>
+    <color name="bg_app">#F0F2F5</color>
+    <color name="bg_card">#FFFFFF</color>
+    <color name="bg_card_dark">#1A1D26</color>
+    <color name="bg_panel">#FFFFFF</color>
+
+    <!-- Text -->
+    <color name="text_primary">#1A1D26</color>
+    <color name="text_secondary">#4A5061</color>
+    <color name="text_muted">#8891A5</color>
+    <color name="text_inverse">#FFFFFF</color>
+    <color name="text_hint">#A0A8B8</color>
+
+    <!-- Brand -->
+    <color name="primary">#5B6EF5</color>
+    <color name="primary_dark">#4A5CE0</color>
+    <color name="primary_light">#7B8AF7</color>
+    <color name="accent">#00C8A8</color>
+    <color name="accent_dark">#00B596</color>
+
+    <!-- Category colors -->
+    <color name="cat_mesh">#5B6EF5</color>
+    <color name="cat_mesh_bg">#EEF0FE</color>
+    <color name="cat_ktx">#00C8A8</color>
+    <color name="cat_ktx_bg">#E6FAF5</color>
+    <color name="cat_level">#FF8C42</color>
+    <color name="cat_level_bg">#FFF3EA</color>
+
+    <!-- Status -->
+    <color name="status_bg">#EEF0FE</color>
+    <color name="status_border">#D1D9F9</color>
+    <color name="status_success">#00C8A8</color>
+    <color name="status_warning">#FFB54D</color>
+    <color name="status_error">#FF5C7A</color>
+
+    <!-- Borders & dividers -->
+    <color name="border_light">#E8EBF0</color>
+    <color name="border_medium">#D5DAE3</color>
+    <color name="divider">#E2E8F0</color>
+
+    <!-- Buttons -->
+    <color name="btn_primary_bg">#5B6EF5</color>
+    <color name="btn_primary_text">#FFFFFF</color>
+    <color name="btn_secondary_bg">#F3F5F9</color>
+    <color name="btn_secondary_text">#4A5061</color>
+    <color name="btn_disabled_bg">#E0E3EA</color>
+    <color name="btn_disabled_text">#A0A8B8</color>
+
+    <!-- Viewport overlay -->
+    <color name="overlay_bg">#80000000</color>
+    <color name="overlay_text">#CCFFFFFF</color>
+    <color name="overlay_hint">#60FFFFFF</color>
+
+    <!-- Search box -->
+    <color name="search_bg">#F3F5F9</color>
+    <color name="search_border">#E0E3EA</color>
+
+    <!-- Legacy compat -->
+    <color name="bg_panel_border">#D9DEE6</color>
+</resources>
