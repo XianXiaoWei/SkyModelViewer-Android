@@ -1,0 +1,433 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/bg_app">
+
+    <!-- ===== COMPACT TOP BAR ===== -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@color/bg_card"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp">
+
+        <Button
+            android:id="@+id/btnChooseApk"
+            style="@style/SkyButton"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:text="@string/choose_apk"
+            android:textSize="12sp"
+            android:minWidth="80dp" />
+
+        <Button
+            android:id="@+id/btnChooseInstalled"
+            style="@style/SkyButton.Secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:text="@string/choose_installed"
+            android:textSize="12sp"
+            android:layout_marginStart="6dp"
+            android:minWidth="80dp" />
+
+        <TextView
+            android:id="@+id/statusText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/status_ready"
+            android:textSize="11sp"
+            android:textColor="@color/primary"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:layout_marginStart="8dp" />
+
+        <TextView
+            android:id="@+id/meshCountText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/no_index_loaded"
+            android:textSize="10sp"
+            android:textColor="@color/text_muted"
+            android:layout_marginStart="6dp" />
+    </LinearLayout>
+
+    <!-- Source path (single thin line) -->
+    <TextView
+        android:id="@+id/sourcePathText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/status_select_source"
+        android:textSize="10sp"
+        android:textColor="@color/text_muted"
+        android:singleLine="true"
+        android:ellipsize="middle"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="3dp"
+        android:background="@color/bg_card" />
+
+    <!-- ===== TOOLBAR ROW (horizontally scrollable) ===== -->
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none"
+        android:background="@color/bg_card"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp">
+
+        <TextView
+            android:id="@+id/selectionTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="100dp"
+            android:maxWidth="140dp"
+            android:text="@string/no_mesh_selected"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary"
+            android:singleLine="true"
+            android:ellipsize="end" />
+
+        <RadioGroup
+            android:id="@+id/viewModeGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="28dp"
+            android:orientation="horizontal"
+            android:layout_marginStart="8dp">
+
+            <RadioButton
+                android:id="@+id/btnTexture"
+                android:layout_width="wrap_content"
+                android:layout_height="28dp"
+                android:text="@string/view_texture"
+                android:textSize="11sp"
+                android:checked="true" />
+
+            <RadioButton
+                android:id="@+id/btnSolid"
+                android:layout_width="wrap_content"
+                android:layout_height="28dp"
+                android:text="@string/view_solid"
+                android:textSize="11sp" />
+
+            <RadioButton
+                android:id="@+id/btnWire"
+                android:layout_width="wrap_content"
+                android:layout_height="28dp"
+                android:text="@string/view_wire"
+                android:textSize="11sp" />
+        </RadioGroup>
+
+        <Button
+            android:id="@+id/btnExport"
+            android:layout_width="wrap_content"
+            android:layout_height="28dp"
+            android:text="@string/export"
+            android:textSize="11sp"
+            android:textAllCaps="false"
+            android:minWidth="56dp"
+            android:minHeight="0dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:layout_marginStart="6dp"
+            android:enabled="false" />
+
+        <Button
+            android:id="@+id/btnBatchExport"
+            android:layout_width="wrap_content"
+            android:layout_height="28dp"
+            android:text="@string/batch_export"
+            android:textSize="11sp"
+            android:textAllCaps="false"
+            android:minWidth="56dp"
+            android:minHeight="0dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:layout_marginStart="4dp"
+            android:enabled="false" />
+
+        <Button
+            android:id="@+id/btnToggleBeamo"
+            android:layout_width="wrap_content"
+            android:layout_height="28dp"
+            android:text="Beamo"
+            android:textSize="11sp"
+            android:textAllCaps="false"
+            android:minWidth="48dp"
+            android:minHeight="0dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:layout_marginStart="4dp" />
+
+        <Button
+            android:id="@+id/btnSelectAnim"
+            android:layout_width="wrap_content"
+            android:layout_height="28dp"
+            android:text="动画"
+            android:textSize="11sp"
+            android:textAllCaps="false"
+            android:minWidth="48dp"
+            android:minHeight="0dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:layout_marginStart="4dp"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/btnPlayPause"
+            android:layout_width="wrap_content"
+            android:layout_height="28dp"
+            android:text="▶"
+            android:textSize="14sp"
+            android:textAllCaps="false"
+            android:minWidth="36dp"
+            android:minHeight="0dp"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:layout_marginStart="4dp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/animTimeText"
+            android:layout_width="wrap_content"
+            android:layout_height="28dp"
+            android:text="0.0s"
+            android:textSize="10sp"
+            android:textColor="#CCCCCC"
+            android:gravity="center"
+            android:minWidth="40dp"
+            android:layout_marginStart="4dp"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/btnAnimFilter"
+            android:layout_width="wrap_content"
+            android:layout_height="28dp"
+            android:text="全部"
+            android:textSize="11sp"
+            android:textAllCaps="false"
+            android:minWidth="48dp"
+            android:minHeight="0dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:layout_marginStart="4dp"
+            android:visibility="gone" />
+    </LinearLayout>
+    </HorizontalScrollView>
+
+    <!-- ===== ANIMATION SEEK BAR ===== -->
+    <SeekBar
+        android:id="@+id/animSeekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="100"
+        android:progress="0"
+        android:visibility="gone" />
+
+    <!-- ===== 3D VIEWPORT ===== -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="5"
+        android:background="@color/bg_dark"
+        android:layout_margin="4dp">
+
+        <com.sky.modelviewer.render.MeshSurfaceView
+            android:id="@+id/meshViewport"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:id="@+id/selectionMeta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|start"
+            android:layout_margin="6dp"
+            android:textSize="10sp"
+            android:textColor="#80FFFFFF"
+            android:text="" />
+
+        <TextView
+            android:id="@+id/animNameOverlay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|end"
+            android:layout_margin="6dp"
+            android:textSize="10sp"
+            android:textColor="#80FFFFFF"
+            android:text=""
+            android:visibility="gone" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|start"
+            android:layout_margin="6dp"
+            android:text="拖动旋转 双指缩放"
+            android:textColor="#50FFFFFF"
+            android:textSize="9sp" />
+
+        <FrameLayout
+            android:id="@+id/joystickArea"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_gravity="bottom|start"
+            android:layout_marginStart="8dp"
+            android:layout_marginBottom="8dp">
+
+            <View
+                android:id="@+id/joystickBase"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:background="@drawable/joystick_bg" />
+
+            <View
+                android:id="@+id/joystickThumb"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center"
+                android:background="@drawable/joystick_thumb" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="48dp">
+
+            <Button
+                android:id="@+id/btnMoveUp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:text="▲"
+                android:textSize="16sp"
+                android:textColor="#FFFFFF"
+                android:background="#60000000"
+                android:padding="0dp" />
+
+            <View android:layout_width="match_parent" android:layout_height="4dp" />
+
+            <Button
+                android:id="@+id/btnMoveDown"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:text="▼"
+                android:textSize="16sp"
+                android:textColor="#FFFFFF"
+                android:background="#60000000"
+                android:padding="0dp" />
+        </LinearLayout>
+    </FrameLayout>
+
+    <!-- ===== BOTTOM: Asset Browser ===== -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="3"
+        android:orientation="vertical"
+        android:background="@color/bg_card"
+        android:layout_margin="4dp"
+        android:padding="6dp">
+
+        <!-- Search -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="4dp">
+
+            <EditText
+                android:id="@+id/searchBox"
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                android:layout_weight="1"
+                android:hint="@string/filter_meshes"
+                android:textSize="11sp"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_hint"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:background="@drawable/search_bg"
+                android:singleLine="true"
+                android:inputType="text" />
+        </LinearLayout>
+
+        <!-- Three columns -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <ListView
+                android:id="@+id/listMesh"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:fastScrollEnabled="true"
+                android:scrollbars="vertical"
+                android:divider="@color/divider"
+                android:dividerHeight="1dp" />
+
+            <View android:layout_width="1dp" android:layout_height="match_parent" android:background="@color/divider" />
+
+            <ListView
+                android:id="@+id/listKtx"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:fastScrollEnabled="true"
+                android:scrollbars="vertical"
+                android:divider="@color/divider"
+                android:dividerHeight="1dp" />
+
+            <View android:layout_width="1dp" android:layout_height="match_parent" android:background="@color/divider" />
+
+            <ListView
+                android:id="@+id/listLevel"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:fastScrollEnabled="true"
+                android:scrollbars="vertical"
+                android:divider="@color/divider"
+                android:dividerHeight="1dp" />
+        </LinearLayout>
+
+        <!-- Details -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/search_bg">
+
+            <TextView
+                android:id="@+id/detailsBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="10sp"
+                android:typeface="monospace"
+                android:textColor="@color/text_secondary"
+                android:padding="6dp"
+                android:text="选择模型查看详情" />
+        </ScrollView>
+    </LinearLayout>
+</LinearLayout>
