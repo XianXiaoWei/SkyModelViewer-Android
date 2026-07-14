@@ -24,6 +24,7 @@
   - 模型：OBJ / GLB / FBX
   - 贴图：PNG / JPEG
   - 地图：完整关卡导出（地形 + mesh 实例，含位置变换）→ OBJ / GLB / FBX
+- **动画播放**：支持animpack解码。
 
 ## 📦 支持的文件格式与版本
 
