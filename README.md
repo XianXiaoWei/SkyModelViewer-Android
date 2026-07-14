@@ -194,6 +194,8 @@ app/src/main/java/com/sky/modelviewer/
 
 ## 📋 更新历史
 
+- **v1.4.0** — 支持动画播放
+- **v1.3.0** — 地图先祖位置显示，UI优化
 - **v1.2.0** — 多格式导出（OBJ/GLB/FBX/PNG/JPEG）+ 完整关卡导出
 - **v1.1.0** — 全版本 .mesh/.meshes 解析支持（0x17-0x20, 0x34-0x3D）
 - **v1.0.0** — 初始版本，基础 APK 浏览与 3D 模型预览
