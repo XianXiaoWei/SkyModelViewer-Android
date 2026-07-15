@@ -200,6 +200,8 @@ app/src/main/java/com/sky/modelviewer/
 - **v1.1.0** — 全版本 .mesh/.meshes 解析支持（0x17-0x20, 0x34-0x3D）
 - **v1.0.0** — 初始版本，基础 APK 浏览与 3D 模型预览
 
+- **v2.0.0** — 2.0及以后版本为扩展功能，无需求请使用2.0以前的版本
+
 ## 🤝 贡献与反馈
 
 由于是个人维护的移植项目，目前可能有很多不完善的地方。欢迎通过 [**Issues**](https://github.com/XianXiaoWei/SkyModelViewer-Android/issues) 页面提出建议或报告问题。
