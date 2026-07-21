@@ -1,0 +1,379 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/bg_app">
+
+    <!-- Top Bar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@color/bg_card"
+        android:padding="12dp">
+
+        <Button
+            android:id="@+id/btnBack"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="返回"
+            android:textSize="13sp"
+            android:minWidth="64dp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="光遇快报"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/primary"
+            android:gravity="center"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp" />
+
+        <Button
+            android:id="@+id/btnRefreshAll"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="刷新"
+            android:textSize="13sp"
+            android:minWidth="64dp" />
+    </LinearLayout>
+
+    <!-- API Key Input Bar -->
+    <LinearLayout
+        android:id="@+id/apiKeyBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@color/bg_card"
+        android:padding="8dp"
+        android:layout_marginBottom="4dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="API Key:"
+            android:textSize="12sp"
+            android:textColor="@color/text_muted"
+            android:layout_marginStart="4dp" />
+
+        <EditText
+            android:id="@+id/etApiKey"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:hint="输入 api.vqqc.cn 的接口密钥"
+            android:textSize="12sp"
+            android:inputType="textPassword"
+            android:singleLine="true"
+            android:background="#F0F2F5"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="6dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp" />
+
+        <Button
+            android:id="@+id/btnSaveKey"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="保存"
+            android:textSize="12sp"
+            android:minWidth="56dp" />
+    </LinearLayout>
+
+    <!-- Scrollable Content -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <!-- Card 1: Daily Quests -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/bg_card"
+                android:padding="12dp"
+                android:layout_marginBottom="8dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="每日任务位置"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/primary" />
+
+                    <ProgressBar
+                        android:id="@+id/pbDailyQuest"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:visibility="gone" />
+
+                    <Button
+                        android:id="@+id/btnLoadDailyQuest"
+                        android:layout_width="wrap_content"
+                        android:layout_height="32dp"
+                        android:text="加载"
+                        android:textSize="11sp"
+                        android:minWidth="56dp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvDailyQuestDesc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="获取每日任务详情位置图片"
+                    android:textSize="11sp"
+                    android:textColor="@color/text_muted"
+                    android:layout_marginTop="2dp" />
+
+                <ImageView
+                    android:id="@+id/ivDailyQuest"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitCenter"
+                    android:layout_marginTop="8dp"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/tvDailyQuestError"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="11sp"
+                    android:textColor="#FF6B6B"
+                    android:layout_marginTop="4dp"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <!-- Card 2: Red Stone Weather -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/bg_card"
+                android:padding="12dp"
+                android:layout_marginBottom="8dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="红石天气预报"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/primary" />
+
+                    <ProgressBar
+                        android:id="@+id/pbRedStone"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:visibility="gone" />
+
+                    <Button
+                        android:id="@+id/btnLoadRedStone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="32dp"
+                        android:text="加载"
+                        android:textSize="11sp"
+                        android:minWidth="56dp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvRedStoneDesc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="红石位置及天气预报"
+                    android:textSize="11sp"
+                    android:textColor="@color/text_muted"
+                    android:layout_marginTop="2dp" />
+
+                <TextView
+                    android:id="@+id/tvRedStoneInfo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="@color/primary"
+                    android:layout_marginTop="4dp"
+                    android:visibility="gone" />
+
+                <LinearLayout
+                    android:id="@+id/llRedStoneImages"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginTop="8dp"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/tvRedStoneError"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="11sp"
+                    android:textColor="#FF6B6B"
+                    android:layout_marginTop="4dp"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <!-- Card 3: Free Magic -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/bg_card"
+                android:padding="12dp"
+                android:layout_marginBottom="8dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="免费魔法"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/primary" />
+
+                    <ProgressBar
+                        android:id="@+id/pbFreeMagic"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:visibility="gone" />
+
+                    <Button
+                        android:id="@+id/btnLoadFreeMagic"
+                        android:layout_width="wrap_content"
+                        android:layout_height="32dp"
+                        android:text="加载"
+                        android:textSize="11sp"
+                        android:minWidth="56dp" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="今日可用免费魔法"
+                    android:textSize="11sp"
+                    android:textColor="@color/text_muted"
+                    android:layout_marginTop="2dp" />
+
+                <ImageView
+                    android:id="@+id/ivFreeMagic"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitCenter"
+                    android:layout_marginTop="8dp"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/tvFreeMagicError"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="11sp"
+                    android:textColor="#FF6B6B"
+                    android:layout_marginTop="4dp"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <!-- Card 4: Big Candles -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/bg_card"
+                android:padding="12dp"
+                android:layout_marginBottom="8dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="大蜡烛位置"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/primary" />
+
+                    <ProgressBar
+                        android:id="@+id/pbBigCandle"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:visibility="gone" />
+
+                    <Button
+                        android:id="@+id/btnLoadBigCandle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="32dp"
+                        android:text="加载"
+                        android:textSize="11sp"
+                        android:minWidth="56dp" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="今日大蜡烛位置图"
+                    android:textSize="11sp"
+                    android:textColor="@color/text_muted"
+                    android:layout_marginTop="2dp" />
+
+                <ImageView
+                    android:id="@+id/ivBigCandle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitCenter"
+                    android:layout_marginTop="8dp"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/tvBigCandleError"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="11sp"
+                    android:textColor="#FF6B6B"
+                    android:layout_marginTop="4dp"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>
