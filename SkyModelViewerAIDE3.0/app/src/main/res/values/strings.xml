@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">光遇模型查看器</string>
+    <string name="select_source">选择来源</string>
+    <string name="choose_apk">选择APK文件</string>
+    <string name="choose_installed">选择已安装应用</string>
+    <string name="sky_news">光遇快报</string>
+    <string name="asset_browser">资源浏览器</string>
+    <string name="no_index_loaded">未加载索引</string>
+    <string name="filter_meshes">筛选模型...</string>
+    <string name="no_mesh_selected">未选择模型</string>
+    <string name="selection_details">选择详情</string>
+    <string name="export_glb">导出GLB</string>
+    <string name="export">导出</string>
+    <string name="batch_export">批量导出</string>
+    <string name="view_texture">贴图</string>
+    <string name="view_solid">实体</string>
+    <string name="view_wire">线框</string>
+    <string name="status_ready">就绪</string>
+    <string name="status_select_source">请选择APK或已安装应用</string>
+    <string name="status_indexing">正在索引资源...</string>
+    <string name="status_indexed">已索引 %1$d 个模型</string>
+    <string name="status_loading">正在加载 %1$s</string>
+    <string name="status_loaded">已加载 %1$s</string>
+    <string name="status_exporting">正在导出GLB...</string>
+    <string name="status_exported">已导出到 %1$s</string>
+    <string name="status_export_failed">导出失败</string>
+    <string name="status_batch_complete">批量完成: 导出 %1$d, 跳过 %2$d, 失败 %3$d</string>
+    <string name="auto_piano">自动弹琴</string>
+    <string name="piano_service_desc">光遇自动弹琴服务</string>
+</resources>
